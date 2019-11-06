@@ -8,11 +8,10 @@ package com.lightbend.akka.sample;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.lightbend.akka.sample.Process.ProcessList;
-import com.lightbend.akka.sample.Process.Welcome;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Random;
 
 /**
  *
@@ -26,6 +25,11 @@ public class Process_system {
             Scanner reader = new Scanner(System.in);
             System.out.println("How many processes do you want in the system ?");
             int n = reader.nextInt();
+            
+            // Choose random crashed processes 
+            Random r = new Random();
+            int fails = r.nextInt(n/2);
+            
             
             ArrayList <ActorRef> listProcesses = new ArrayList<>();
             

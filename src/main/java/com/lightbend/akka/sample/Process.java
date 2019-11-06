@@ -10,7 +10,6 @@ import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -25,19 +24,10 @@ public class Process extends UntypedAbstractActor {
     // Actor reference that points to neighbor actor
     
     private ArrayList<ActorRef> ActorList;
-        
-    static public class ProcessList implements Serializable {
-		public final ArrayList<ActorRef> list;
-	
-		public ProcessList(ArrayList<ActorRef> l) {
-                        // this.list = org.apache.commons.lang3.SerializationUtils.clone(l);
-                        this.list = l;
-                }
-                
-                public ArrayList<ActorRef> getlist(){
-                    return this.list;
-                }
-    }   
+    
+    // Boolean status : faulty or safe
+    
+    private boolean status; 
     
     static public class Welcome{
         public final String msg;
