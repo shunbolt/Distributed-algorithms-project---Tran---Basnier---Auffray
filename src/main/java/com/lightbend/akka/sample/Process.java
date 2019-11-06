@@ -26,8 +26,17 @@ public class Process extends UntypedAbstractActor {
     private ArrayList<ActorRef> ActorList;
     
     // Boolean status : faulty or safe
+     
     
-    private boolean status; 
+    
+    // Sequence value that tells if the actor is up to date
+    
+    private int sequence;
+    
+    
+    // Value stored 
+    
+    private int value;
     
     static public class Welcome{
         public final String msg;

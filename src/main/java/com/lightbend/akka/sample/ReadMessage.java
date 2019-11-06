@@ -11,4 +11,15 @@ package com.lightbend.akka.sample;
  */
 public class ReadMessage {
     
+    private int seq;
+    
+            public ReadMessage(int s) {
+                       
+                        this.seq = s;
+            }
+            
+            public int getSeq() {
+                return this.seq;
+            }
+    
 }

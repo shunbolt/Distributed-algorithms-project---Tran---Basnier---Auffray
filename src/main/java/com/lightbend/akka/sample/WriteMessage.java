@@ -11,4 +11,21 @@ package com.lightbend.akka.sample;
  */
 public class WriteMessage {
     
+    private int seq;
+    private int val;
+    
+            public WriteMessage(int s, int v) {
+                       
+                        this.seq = s;
+                        this.val = v;
+                }
+            
+            public int getSeq(){
+                return this.seq;
+            }
+            
+            public int getVal(){
+                return this.val;
+            }
+            
 }

@@ -14,13 +14,14 @@ import java.util.ArrayList;
  * @author Raphael Tran
  */
 public class ProcessList implements Serializable {
+    
                 private static final long serialVersionUID = 1L;
                 
 		public final ArrayList<ActorRef> list;
 	
 		public ProcessList(ArrayList<ActorRef> l) {
-                        this.list = org.apache.commons.lang3.SerializationUtils.clone(l);
-                        // this.list = l;
+                        // this.list = org.apache.commons.lang3.SerializationUtils.clone(l);
+                        this.list = l;
                 }
                 
                 public ArrayList<ActorRef> getlist(){
