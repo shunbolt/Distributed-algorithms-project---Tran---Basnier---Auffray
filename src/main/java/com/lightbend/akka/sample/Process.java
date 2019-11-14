@@ -85,12 +85,16 @@ public class Process extends UntypedAbstractActor {
                         this.sequence = ((WriteMessage) message).getSeq();
                         this.value = ((WriteMessage) message).getVal();
                         log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name());
-                        // Send ACK message as WriteAnswer
+                        // Send ACK message as WriteAnswer to the sender
+                        WriteAnswer ans = new WriteAnswer(this.sequence);
+                        getSender().tell(ans,getSelf());
                     }
                 }
                 if(message instanceof ReadMessage){
                     log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name());
                     // Send seq, value and readid to the sender as ReadAnswer
+                    ReadAnswer ans = new ReadAnswer(this.sequence, this.value);
+                    getSender().tell(ans,getSelf());
                 }
 	}
     
