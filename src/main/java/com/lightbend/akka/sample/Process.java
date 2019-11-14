@@ -78,6 +78,19 @@ public class Process extends UntypedAbstractActor {
                     Welcome w = (Welcome) message;
                     log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with content: ["+w.msg+"]");
                 }
+                // Behavior for a write message
+                if(message instanceof WriteMessage){
+                    if(this.sequence > ((WriteMessage) message).getSeq()){
+                        this.sequence = ((WriteMessage) message).getSeq();
+                        this.value = ((WriteMessage) message).getVal();
+                        log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name());
+                        // Send ACK message as WriteAnswer
+                    }
+                }
+                if(message instanceof ReadMessage){
+                    log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name());
+                    // Send seq, value and readid to the sender as ReadAnswer
+                }
 	}
     
 }
