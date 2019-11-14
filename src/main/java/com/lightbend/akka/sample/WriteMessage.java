@@ -6,7 +6,7 @@
 package com.lightbend.akka.sample;
 
 /**
- *
+ * Class WriteMessage which instrcut a process to write a value
  * @author Raphael Tran
  */
 public class WriteMessage {

@@ -6,7 +6,8 @@
 package com.lightbend.akka.sample;
 
 /**
- *
+ * Class ReadMessage which isntructs a process to read it's value
+ * 
  * @author Raphael Tran
  */
 public class ReadMessage {

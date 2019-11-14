@@ -80,6 +80,7 @@ public class Process extends UntypedAbstractActor {
                 }
                 // Behavior for a write message
                 if(message instanceof WriteMessage){
+                    // Write out value and sequence integers of the process
                     if(this.sequence > ((WriteMessage) message).getSeq()){
                         this.sequence = ((WriteMessage) message).getSeq();
                         this.value = ((WriteMessage) message).getVal();

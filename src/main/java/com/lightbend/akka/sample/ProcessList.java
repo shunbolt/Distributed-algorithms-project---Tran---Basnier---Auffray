@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- *
+ * List of processes stored in a serializable class ProcessList
  * @author Raphael Tran
  */
 public class ProcessList implements Serializable {
