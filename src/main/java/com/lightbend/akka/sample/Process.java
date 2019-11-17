@@ -79,7 +79,7 @@ public class Process extends UntypedAbstractActor {
         while(this.counter_WriteAnswer < this.ActorList.size()/2){
             
         }
-        return true;
+        return false;
     }
     
     // Function get that returns value of the system
@@ -144,6 +144,8 @@ public class Process extends UntypedAbstractActor {
                 }
                 // Behavior for a launch message
                 if(message instanceof Launch){
+                    this.setSeq(0);
+                    log.info("Launch Message successfully received");
                     while(this.put(3)){
                         log.info("VALUE READ AT THAT TIME IS : " + this.get() + " - CORRECT VALUE IS 3");                        
                     }

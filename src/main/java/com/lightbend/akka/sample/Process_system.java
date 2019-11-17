@@ -8,6 +8,7 @@ package com.lightbend.akka.sample;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import com.lightbend.akka.sample.Process.Launch;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -27,8 +28,8 @@ public class Process_system {
             int n = reader.nextInt();
             
             // Choose random crashed processes 
-            Random r = new Random();
-            int fails = r.nextInt(n/2);
+                // Random r = new Random();
+                // int fails = r.nextInt(n/2);
             
             
             ArrayList <ActorRef> listProcesses = new ArrayList<>();
@@ -47,6 +48,10 @@ public class Process_system {
                 pl = new ProcessList(listProcesses);
                 process.tell(pl, ActorRef.noSender());  
             }
+            
+            // Launch first process (assuming no fails)
+            Launch l = new Launch();
+            listProcesses.get(0).tell(l, ActorRef.noSender());
             
             System.out.println(">>> Press ENTER to exit <<<");
             System.in.read();
