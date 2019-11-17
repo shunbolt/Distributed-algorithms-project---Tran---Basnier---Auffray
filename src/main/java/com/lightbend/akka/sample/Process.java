@@ -139,6 +139,7 @@ public class Process extends UntypedAbstractActor {
                 // Behavior for a welcome message
                 if(message instanceof Welcome){
                     Welcome w = (Welcome) message;
+                    this.setSeq(0);
                     log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with content: ["+w.msg+"]");
                 }
                 // Behavior for a launch message
