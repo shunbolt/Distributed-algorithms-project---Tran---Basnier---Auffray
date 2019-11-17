@@ -130,6 +130,12 @@ public class Process extends UntypedAbstractActor {
                     Welcome w = (Welcome) message;
                     log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with content: ["+w.msg+"]");
                 }
+                // Behavior for a launch message
+                if(message instanceof Launch){
+                    while(this.put(3)){
+                        log.info("VALUE READ AT THAT TIME IS : " + this.get() + " - CORRECT VALUE IS 3");                        
+                    }
+                }
                 // Behavior for a write message
                 if(message instanceof WriteMessage){
                     // Write out value and sequence integers of the process
