@@ -38,12 +38,12 @@ public class Process extends UntypedAbstractActor {
     
     private int value;
     
-    // Counters used for the number of answers received
+    // Counter and array used for the number of answers received
     
     private int counter_WriteAnswer;
-    private int counter_ReadAnswer;
+    private ArrayList<ReadAnswer> ReadAnswerList;
     
-    
+    // Welcome class message
     static public class Welcome{
         public final String msg;
         
@@ -107,7 +107,8 @@ public class Process extends UntypedAbstractActor {
                     log.info("["+getSelf().path().name()+"] received WriteAnswer message from ["+ getSender().path().name());
                 }
                 if(message instanceof ReadAnswer){
-                    this.counter_ReadAnswer++;
+                    ReadAnswer ans = (ReadAnswer) message;
+                    this.ReadAnswerList.add(ans);
                     log.info("["+getSelf().path().name()+"] received ReadAnswer message from ["+ getSender().path().name());
                 }
 	}
