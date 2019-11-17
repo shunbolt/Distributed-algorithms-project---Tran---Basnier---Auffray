@@ -53,10 +53,27 @@ public class Process extends UntypedAbstractActor {
     }
     
     
+    // Launch message to trigger processes operations put and get
+    
+    static public class Launch{}
+    
     // Empty constructor
     public Process() {};
     
+    // Function put that writes a value
     
+    public boolean put(int v){
+        // Sends a Writemessage to all processes 
+        WriteMessage msg = new WriteMessage(this.sequence + 1,v);
+        for(ActorRef process : this.ActorList){
+            process.tell(msg, getSelf());
+        }
+        // Wait that at least half the processes are done.
+        while(this.counter_WriteAnswer < this.ActorList.size()/2){
+            
+        }
+        return true;
+    }
     
     // Static function that creates the actor
     public static Props createActor() {
