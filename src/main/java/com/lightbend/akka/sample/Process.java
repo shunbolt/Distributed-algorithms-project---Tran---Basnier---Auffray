@@ -68,12 +68,41 @@ public class Process extends UntypedAbstractActor {
         for(ActorRef process : this.ActorList){
             process.tell(msg, getSelf());
         }
-        // Wait that at least half the processes are done.
+        // Wait that at least half the processes have answered
         while(this.counter_WriteAnswer < this.ActorList.size()/2){
             
         }
         return true;
     }
+    
+    // Function get that returns value of the system
+    
+    public int get(){
+        
+        int val = -1;
+        int current_seq = 0;
+        ReadMessage msg = new ReadMessage(this.sequence + 1);
+        this.ReadAnswerList = new ArrayList<>();
+        // Sends a ReadMessage to all processes
+        for(ActorRef process : this.ActorList){
+            process.tell(msg, getSelf());
+        }
+        // Wait that at least half the processes have answered
+        while(this.ReadAnswerList.size() < this.ActorList.size()/2){
+            
+        }
+        // Select among the responses the most up to date one
+        for(ReadAnswer ans : this.ReadAnswerList){
+            if(current_seq < ans.getSeq() ){
+                current_seq = ans.getSeq();
+                val = ans.getVal();
+            }
+        }
+        
+        return val;
+    }
+    
+    // Function that
     
     // Static function that creates the actor
     public static Props createActor() {
