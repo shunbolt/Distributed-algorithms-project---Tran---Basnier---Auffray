@@ -27,7 +27,7 @@ public class Process extends UntypedAbstractActor {
     
     // Boolean status : faulty or safe
      
-    // private bool safe;
+        // private bool safe;
     
     // Sequence value that tells if the actor is up to date
     
@@ -43,6 +43,10 @@ public class Process extends UntypedAbstractActor {
     private int counter_WriteAnswer;
     private ArrayList<ReadAnswer> ReadAnswerList;
     
+    /*
+        Classes
+    */
+    
     // Welcome class message
     static public class Welcome{
         public final String msg;
@@ -52,13 +56,16 @@ public class Process extends UntypedAbstractActor {
         }
     }
     
-    
     // Launch message to trigger processes operations put and get
     
     static public class Launch{}
     
     // Empty constructor
     public Process() {};
+    
+    /*
+        Functions
+    */
     
     // Function put that writes a value
     
@@ -102,7 +109,11 @@ public class Process extends UntypedAbstractActor {
         return val;
     }
     
-    // Function that
+    // Setter for sequence
+    
+    public void setSeq(int s){
+        this.sequence = s;
+    }
     
     // Static function that creates the actor
     public static Props createActor() {
