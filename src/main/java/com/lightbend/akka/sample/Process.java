@@ -27,7 +27,7 @@ public class Process extends UntypedAbstractActor {
     
     // Boolean status : faulty or safe
      
-    
+    // private bool safe;
     
     // Sequence value that tells if the actor is up to date
     
@@ -37,6 +37,12 @@ public class Process extends UntypedAbstractActor {
     // Value stored 
     
     private int value;
+    
+    // Counters used for the number of answers received
+    
+    private int counter_WriteAnswer;
+    private int counter_ReadAnswer;
+    
     
     static public class Welcome{
         public final String msg;
@@ -95,6 +101,14 @@ public class Process extends UntypedAbstractActor {
                     // Send seq, value and readid to the sender as ReadAnswer
                     ReadAnswer ans = new ReadAnswer(this.sequence, this.value);
                     getSender().tell(ans,getSelf());
+                }
+                if(message instanceof WriteAnswer){
+                    this.counter_WriteAnswer++;
+                    log.info("["+getSelf().path().name()+"] received WriteAnswer message from ["+ getSender().path().name());
+                }
+                if(message instanceof ReadAnswer){
+                    this.counter_ReadAnswer++;
+                    log.info("["+getSelf().path().name()+"] received ReadAnswer message from ["+ getSender().path().name());
                 }
 	}
     
