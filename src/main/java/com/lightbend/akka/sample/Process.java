@@ -58,7 +58,7 @@ public class Process extends UntypedAbstractActor {
     
     // Launch message to trigger processes operations put and get
     
-    static public class Launch{}
+    
     
     // Empty constructor
     public Process() {};
@@ -68,17 +68,21 @@ public class Process extends UntypedAbstractActor {
     */
     
     // Function put that writes a value
-    
+    /***
     public boolean put(int v){
         // Sends a Writemessage to all processes 
         WriteMessage msg = new WriteMessage(this.sequence + 1,v);
+        this.counter_WriteAnswer = 0;
         for(ActorRef process : this.ActorList){
             process.tell(msg, getSelf());
         }
         // Wait that at least half the processes have answered
-        while(this.counter_WriteAnswer < this.ActorList.size()/2){
-            
+         while(this.counter_WriteAnswer < this.ActorList.size()/2){
+            if(this.counter_WriteAnswer >= this.ActorList.size()/2){
+                break;
+            }
         }
+        
         return false;
     }
     
@@ -95,8 +99,10 @@ public class Process extends UntypedAbstractActor {
             process.tell(msg, getSelf());
         }
         // Wait that at least half the processes have answered
+        
+        
         while(this.ReadAnswerList.size() < this.ActorList.size()/2){
-            
+            log.info("Process waiting for at least half answers");
         }
         // Select among the responses the most up to date one
         for(ReadAnswer ans : this.ReadAnswerList){
@@ -108,7 +114,7 @@ public class Process extends UntypedAbstractActor {
         
         return val;
     }
-    
+    ***/
     // Setter for sequence
     
     public void setSeq(int s){
@@ -144,38 +150,93 @@ public class Process extends UntypedAbstractActor {
                 }
                 // Behavior for a launch message
                 if(message instanceof Launch){
-                    this.setSeq(0);
-                    log.info("Launch Message successfully received");
-                    while(this.put(3)){
-                        log.info("VALUE READ AT THAT TIME IS : " + this.get() + " - CORRECT VALUE IS 3");                        
+                    PutMessage putmsg = new PutMessage(3);  
+                    getSelf().tell(putmsg, getSelf());
+                }
+                // Behavior for a put message
+                if(message instanceof PutMessage){
+                    // Sends a Writemessage to all processes 
+                    WriteMessage msg = new WriteMessage(this.sequence + 1,((PutMessage) message).getValue());
+                    this.counter_WriteAnswer = 0;
+                    for(ActorRef process : this.ActorList){
+                        process.tell(msg, getSelf());
+                    }
+                    // Sends CheckCounterMessage to self
+                    CheckCounterMessage chk = new CheckCounterMessage();
+                    getSelf().tell(chk, getSelf());
+                }
+                // Behavior for a CheckCounter message 
+                if(message instanceof CheckCounterMessage){
+                    if(this.counter_WriteAnswer < this.ActorList.size()/2) {
+                        getSelf().tell(message, getSelf());
+                    }
+                    else{
+                        GetMessage gmsg = new GetMessage();
+                        getSelf().tell(gmsg,getSelf());
+                    }
+                }
+                // Behavior for a get message
+                if(message instanceof GetMessage){
+                    
+                    
+                    ReadMessage msg = new ReadMessage(this.sequence + 1);
+                    this.ReadAnswerList = new ArrayList<>();
+                    // Sends a ReadMessage to all processes
+                    for(ActorRef process : this.ActorList){
+                        process.tell(msg, getSelf());
+                    }
+                    // Sends CheckRAnswersMessage to self
+                    CheckRAnswerMessage chkmsg = new CheckRAnswerMessage();
+                    getSelf().tell(chkmsg,getSelf());                  
+                }
+                // Behavior for a CheckRAnswerMessage
+                if(message instanceof CheckRAnswerMessage){
+                    if(this.ReadAnswerList.size() < this.ActorList.size()/2){
+                        getSelf().tell(message, getSelf());
+                    }
+                    else{
+                        int current_seq = 0;
+                        int val = -1;
+                        // Select among the responses the most up to date one
+                        for(ReadAnswer ans : this.ReadAnswerList){
+                            
+                            if(current_seq < ans.getSeq() ){
+                                current_seq = ans.getSeq();
+                                val = ans.getVal();
+                            }
+                        } 
+                        log.info("Read value is + " + val + " / Correct value should be 3" );
                     }
                 }
                 // Behavior for a write message
                 if(message instanceof WriteMessage){
                     // Write out value and sequence integers of the process
-                    if(this.sequence > ((WriteMessage) message).getSeq()){
+                    if(this.sequence < ((WriteMessage) message).getSeq()){
                         this.sequence = ((WriteMessage) message).getSeq();
                         this.value = ((WriteMessage) message).getVal();
-                        log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name());
+                        log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name() + "]");
                         // Send ACK message as WriteAnswer to the sender
-                        WriteAnswer ans = new WriteAnswer(this.sequence);
-                        getSender().tell(ans,getSelf());
+                        WriteAnswer ans = new WriteAnswer();
+                        // log.info("Write answer initialized");
+                        
+                        getSender().tell(ans, getSelf());
+                        // this.ActorList.get(0).tell(ans, getSelf());
                     }
                 }
                 if(message instanceof ReadMessage){
-                    log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name());
+                    log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name() + ']');
                     // Send seq, value and readid to the sender as ReadAnswer
                     ReadAnswer ans = new ReadAnswer(this.sequence, this.value);
                     getSender().tell(ans,getSelf());
                 }
                 if(message instanceof WriteAnswer){
-                    this.counter_WriteAnswer++;
-                    log.info("["+getSelf().path().name()+"] received WriteAnswer message from ["+ getSender().path().name());
+                    // log.info("["+getSelf().path().name()+"] received WriteAnswer message from ["+ getSender().path().name() + "]");
+                    this.counter_WriteAnswer++;    
                 }
                 if(message instanceof ReadAnswer){
                     ReadAnswer ans = (ReadAnswer) message;
                     this.ReadAnswerList.add(ans);
-                    log.info("["+getSelf().path().name()+"] received ReadAnswer message from ["+ getSender().path().name());
+                    // log.info("["+getSelf().path().name()+"] received ReadAnswer message from ["+ getSender().path().name() + ']');
                 }
 	}
     

@@ -8,7 +8,6 @@ package com.lightbend.akka.sample;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.lightbend.akka.sample.Process.Launch;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;

@@ -6,16 +6,13 @@
 package com.lightbend.akka.sample;
 
 /**
- * Answer after a WriteMessage where the process acknowledge that it's value has been written
+ *
  * @author Raphael Tran
  */
-public class WriteAnswer {
+public class CheckCounterMessage {
     
-    
-            public WriteAnswer() {
-                       
- 
-            }
+        public CheckCounterMessage(){
             
-         
+        }
+    
 }

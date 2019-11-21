@@ -6,16 +6,18 @@
 package com.lightbend.akka.sample;
 
 /**
- * Answer after a WriteMessage where the process acknowledge that it's value has been written
+ *
  * @author Raphael Tran
  */
-public class WriteAnswer {
+public class PutMessage {
     
+        private int value;
     
-            public WriteAnswer() {
-                       
- 
-            }
-            
-         
+        public PutMessage(int v){
+            this.value = v;
+        }
+        
+        public int getValue(){
+            return this.value;
+        }
 }
