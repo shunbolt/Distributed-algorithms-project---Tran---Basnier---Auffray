@@ -155,6 +155,16 @@ public class Process extends UntypedAbstractActor {
                     getSelf().tell(getmsg, getSelf());
                     
                 }
+                // Behavior for a UpdateSequence message
+                if(message instanceof UpdateSequenceMessage){
+                    ReadMessage msg = new ReadMessage(this.sequence + 1);
+                    this.ReadAnswerList = new ArrayList<>();
+                    // Sends a ReadMessage to all processes
+                    for(ActorRef process : this.ActorList){
+                        process.tell(msg, getSelf());
+                    }
+                    //
+                }
                 // Behavior for a put message
                 if(message instanceof PutMessage){
                     // Sends a Writemessage to all processes 
