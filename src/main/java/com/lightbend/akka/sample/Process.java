@@ -58,8 +58,6 @@ public class Process extends UntypedAbstractActor {
     
     // Launch message to trigger processes operations put and get
     
-    
-    
     // Empty constructor
     public Process() {};
     
@@ -150,8 +148,12 @@ public class Process extends UntypedAbstractActor {
                 }
                 // Behavior for a launch message
                 if(message instanceof Launch){
+                    
                     PutMessage putmsg = new PutMessage(3);  
                     getSelf().tell(putmsg, getSelf());
+                    GetMessage getmsg = new GetMessage();
+                    getSelf().tell(getmsg, getSelf());
+                    
                 }
                 // Behavior for a put message
                 if(message instanceof PutMessage){
@@ -162,7 +164,7 @@ public class Process extends UntypedAbstractActor {
                         process.tell(msg, getSelf());
                     }
                     // Sends CheckCounterMessage to self
-                    CheckCounterMessage chk = new CheckCounterMessage();
+                    CheckCounterMessage chk = new CheckCounterMessage(((PutMessage) message).getValue());
                     getSelf().tell(chk, getSelf());
                 }
                 // Behavior for a CheckCounter message 
@@ -171,14 +173,13 @@ public class Process extends UntypedAbstractActor {
                         getSelf().tell(message, getSelf());
                     }
                     else{
-                        GetMessage gmsg = new GetMessage();
-                        getSelf().tell(gmsg,getSelf());
+                        log.info("The majority of the system has received value " + ((CheckCounterMessage) message).getValue() + "from [" + getSelf().path().name() + "]");
+                        // GetMessage gmsg = new GetMessage();
+                        // getSelf().tell(gmsg,getSelf());
                     }
                 }
                 // Behavior for a get message
                 if(message instanceof GetMessage){
-                    
-                    
                     ReadMessage msg = new ReadMessage(this.sequence + 1);
                     this.ReadAnswerList = new ArrayList<>();
                     // Sends a ReadMessage to all processes
@@ -199,8 +200,8 @@ public class Process extends UntypedAbstractActor {
                         int val = -1;
                         // Select among the responses the most up to date one
                         for(ReadAnswer ans : this.ReadAnswerList){
-                            
-                            if(current_seq < ans.getSeq() ){
+                            // If sequence value is higher than current or has the same, we load new value
+                            if(current_seq < ans.getSeq() || (current_seq == ans.getSeq() && val < ans.getVal()) ){
                                 current_seq = ans.getSeq();
                                 val = ans.getVal();
                             }
@@ -222,6 +223,7 @@ public class Process extends UntypedAbstractActor {
                         getSender().tell(ans, getSelf());
                         // this.ActorList.get(0).tell(ans, getSelf());
                     }
+                    
                 }
                 if(message instanceof ReadMessage){
                     log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name() + ']');

@@ -11,8 +11,14 @@ package com.lightbend.akka.sample;
  */
 public class CheckCounterMessage {
     
-        public CheckCounterMessage(){
-            
+        private int written;
+    
+        public CheckCounterMessage(int v){
+            this.written = v;
+        }
+        
+        public int getValue(){
+            return this.written;
         }
     
 }
