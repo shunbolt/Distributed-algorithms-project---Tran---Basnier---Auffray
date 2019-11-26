@@ -163,7 +163,27 @@ public class Process extends UntypedAbstractActor {
                     for(ActorRef process : this.ActorList){
                         process.tell(msg, getSelf());
                     }
-                    //
+                    // Sends a CheckRAnswerSequence Message
+                    
+                    CheckRAnswerSequenceMessage chkmsg = new CheckRAnswerSequenceMessage(((UpdateSequenceMessage) message).getValue());
+                    getSelf().tell(chkmsg, getSelf());
+                }
+                // Behavior for a CheckRAnswerSequence Message
+                if(message instanceof CheckRAnswerSequenceMessage){
+                    if(this.ReadAnswerList.size() < this.ActorList.size()/2){
+                        getSelf().tell(message, getSelf());
+                    }
+                    else{
+                        int current_seq = 0;
+                        
+                        // Select among the responses the most up to date one
+                        for(ReadAnswer ans : this.ReadAnswerList){
+                            // If sequence value is higher than current or has the same, we load new value
+                            if(current_seq < ans.getSeq() ){
+                                current_seq = ans.getSeq();
+                            }
+                        } 
+                    }
                 }
                 // Behavior for a put message
                 if(message instanceof PutMessage){
