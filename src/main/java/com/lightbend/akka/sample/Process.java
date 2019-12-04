@@ -11,6 +11,7 @@ import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -27,7 +28,7 @@ public class Process extends UntypedAbstractActor {
     
     // Boolean status : faulty or safe
      
-        // private bool safe;
+    private boolean safe = Boolean.TRUE;
     
     // Sequence value that tells if the actor is up to date
     
@@ -119,6 +120,10 @@ public class Process extends UntypedAbstractActor {
         this.sequence = s;
     }
     
+    public void crash(){
+        this.safe = Boolean.FALSE;
+    }
+    
     // Static function that creates the actor
     public static Props createActor() {
 		return Props.create(Process.class, () -> {
@@ -130,6 +135,13 @@ public class Process extends UntypedAbstractActor {
     // createReceive function which describes the behavior of the process when it receives a message
     @Override
 	public void onReceive(Object message) throws Throwable {
+                if(this.safe == Boolean.FALSE){
+                    return;
+                }
+                if(message instanceof KillMessage){
+                    crash();
+                    log.info("[" + getSelf().path().name() + "] has received crash message");
+                }
                 // Store the list of processes into the ProcessList class
                 if(message instanceof ProcessList){
                     this.ActorList = ((ProcessList) message).getlist();
@@ -144,19 +156,22 @@ public class Process extends UntypedAbstractActor {
                 if(message instanceof Welcome){
                     Welcome w = (Welcome) message;
                     this.setSeq(0);
-                    log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with content: ["+w.msg+"]");
+                    // log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with content: ["+w.msg+"]");
                 }
                 // Behavior for a launch message
                 if(message instanceof Launch){
                     
-                    PutMessage putmsg = new PutMessage(3);  
-                    getSelf().tell(putmsg, getSelf());
-                    GetMessage getmsg = new GetMessage();
-                    getSelf().tell(getmsg, getSelf());
-                    
+                    for(int i = 0; i < ((Launch) message).getoperations() ; i++){
+                        Random rand = new Random();
+                        
+                        UpdateSequenceMessage putmsg = new UpdateSequenceMessage(rand.nextInt(10));
+                        getSelf().tell(putmsg, getSelf());
+                    }
                 }
                 // Behavior for a UpdateSequence message
                 if(message instanceof UpdateSequenceMessage){
+                    log.info("********** [" + getSelf().path().name() + "] is updating it's sequence number to put a value" );
+                    
                     ReadMessage msg = new ReadMessage(this.sequence + 1);
                     this.ReadAnswerList = new ArrayList<>();
                     // Sends a ReadMessage to all processes
@@ -182,11 +197,16 @@ public class Process extends UntypedAbstractActor {
                             if(current_seq < ans.getSeq() ){
                                 current_seq = ans.getSeq();
                             }
-                        } 
+                        }
+                        PutMessage putmsg = new PutMessage( ((CheckRAnswerSequenceMessage) message).getValue());
+                        getSelf().tell(putmsg,getSelf());
+                        GetMessage getmsg = new GetMessage();
+                        getSelf().tell(getmsg, getSelf());
                     }
                 }
                 // Behavior for a put message
                 if(message instanceof PutMessage){
+                    log.info("******** Process [" + getSelf().path().name() + "] is launching a Put operation with value " + ((PutMessage) message).getValue() );
                     // Sends a Writemessage to all processes 
                     WriteMessage msg = new WriteMessage(this.sequence + 1,((PutMessage) message).getValue());
                     this.counter_WriteAnswer = 0;
@@ -203,13 +223,14 @@ public class Process extends UntypedAbstractActor {
                         getSelf().tell(message, getSelf());
                     }
                     else{
-                        log.info("The majority of the system has received value " + ((CheckCounterMessage) message).getValue() + "from [" + getSelf().path().name() + "]");
+                        log.info("******** Value " + ((CheckCounterMessage) message).getValue() + " successfully written in the system from [" + getSelf().path().name() + "]");
                         // GetMessage gmsg = new GetMessage();
                         // getSelf().tell(gmsg,getSelf());
                     }
                 }
                 // Behavior for a get message
                 if(message instanceof GetMessage){
+                    log.info("********* Process [" + getSelf().path().name() + "] is launching a Get operation ");
                     ReadMessage msg = new ReadMessage(this.sequence + 1);
                     this.ReadAnswerList = new ArrayList<>();
                     // Sends a ReadMessage to all processes
@@ -236,7 +257,7 @@ public class Process extends UntypedAbstractActor {
                                 val = ans.getVal();
                             }
                         } 
-                        log.info("Read value is + " + val + " / Correct value should be 3" );
+                        log.info("******** Get value is " + val + " from [" + getSelf().path().name() + "]" );
                     }
                 }
                 // Behavior for a write message
@@ -245,7 +266,7 @@ public class Process extends UntypedAbstractActor {
                     if(this.sequence < ((WriteMessage) message).getSeq()){
                         this.sequence = ((WriteMessage) message).getSeq();
                         this.value = ((WriteMessage) message).getVal();
-                        log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name() + "]");
+                        log.info( "["+getSelf().path().name()+"] received write message from ["+ getSender().path().name() + "] with value written " + ((WriteMessage) message).getVal() );
                         // Send ACK message as WriteAnswer to the sender
                         WriteAnswer ans = new WriteAnswer();
                         // log.info("Write answer initialized");
@@ -256,7 +277,7 @@ public class Process extends UntypedAbstractActor {
                     
                 }
                 if(message instanceof ReadMessage){
-                    log.info( "["+getSelf().path().name()+"] received read message from ["+ getSender().path().name() + ']');
+                    log.info( "["+getSelf().path().name()+"] received read query from ["+ getSender().path().name() + ']');
                     // Send seq, value and readid to the sender as ReadAnswer
                     ReadAnswer ans = new ReadAnswer(this.sequence, this.value);
                     getSender().tell(ans,getSelf());

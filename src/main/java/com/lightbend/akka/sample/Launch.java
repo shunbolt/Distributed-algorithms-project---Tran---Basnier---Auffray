@@ -11,8 +11,14 @@ package com.lightbend.akka.sample;
  */
 public class Launch {
     
-        public Launch(){
-            
+        private int operations;
+    
+        public Launch(int ope){
+            this.operations = ope;
+        }
+        
+        public int getoperations(){
+            return this.operations;
         }
     
 }

@@ -9,16 +9,9 @@ package com.lightbend.akka.sample;
  *
  * @author Raphael Tran
  */
-public class CheckRAnswerSequenceMessage {
+public class KillMessage {
     
-    private int value;
-    
-    public CheckRAnswerSequenceMessage(int v){
-        this.value = v;
+    public KillMessage(){
+        
     }
-    
-    public int getValue(){
-        return this.value;
-    }
-    
 }

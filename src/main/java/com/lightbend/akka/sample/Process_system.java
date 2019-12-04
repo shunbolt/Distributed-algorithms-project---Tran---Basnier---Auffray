@@ -10,6 +10,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.Random;
 
@@ -26,6 +27,9 @@ public class Process_system {
             System.out.println("How many processes do you want in the system ?");
             int n = reader.nextInt();
             
+            System.out.println("How many operations per process do you want in the system ?");
+            int ope = reader.nextInt();
+            
             // Choose random crashed processes 
                 // Random r = new Random();
                 // int fails = r.nextInt(n/2);
@@ -40,6 +44,8 @@ public class Process_system {
                 listProcesses.add(system.actorOf(Process.createActor(), pname));
             }
             
+            russianRoulette(listProcesses);
+            
             // Loop and message the n processes with the list of processes
             
             for(ActorRef process : listProcesses ){
@@ -49,8 +55,12 @@ public class Process_system {
             }
             
             // Launch first process (assuming no fails)
-            Launch l = new Launch();
-            listProcesses.get(0).tell(l, ActorRef.noSender());
+            
+            Launch l = new Launch(ope);
+            for(ActorRef process : listProcesses){
+                process.tell(l, ActorRef.noSender());
+            }
+            
             
             System.out.println(">>> Press ENTER to exit <<<");
             System.in.read();
@@ -60,4 +70,27 @@ public class Process_system {
             }
         
     }
+    
+    static void russianRoulette(ArrayList<ActorRef> players){
+        Random rand = new Random();
+        int size = players.size();
+        int bullets = rand.nextInt(size/2);
+
+        System.out.println("There are " + bullets + "/" + size + " processes down.");
+
+        Collections.shuffle(players);
+
+        int cpt = 0;
+        
+        KillMessage kill = new KillMessage();
+        
+        for(ActorRef i : players){
+            if(cpt < bullets){
+                i.tell(kill,ActorRef.noSender());
+            }
+            cpt++;
+        }
+
+    }
 }
+
